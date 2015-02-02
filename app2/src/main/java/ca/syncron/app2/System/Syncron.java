@@ -9,9 +9,7 @@ import ca.syncron.app2.MainActivity;
 import ca.syncron.app2.async.MyReceiver;
 import ca.syncron.app2.async.RequestReceiver;
 import ca.syncron.app2.tools.Debug;
-import msg.MessageWrapper;
-import msg.MsgConstants;
-import msg.ObjectMessengerThread;
+import msg.*;
 
 /**
  * Created by Dawson on 1/31/2015.
@@ -19,19 +17,25 @@ import msg.ObjectMessengerThread;
 
 //public Debug print;
 public class Syncron extends Application implements MsgConstants {
+public static Syncron     singleton;
+public static DataHandler dataHandler;
+public static  NodeData nodeData = new NodeData();
+private static Syncron  syncron  = new Syncron();
 //public static MessageWrapper msg;
-public        Context      syncronContext;
-public static Syncron      singleton;
-public        MainActivity mActivity;
-public        MyReceiver   mReceiver;
+public Context         syncronContext;
+public MainActivity    mActivity;
+public MyReceiver      mReceiver;
 public RequestReceiver mReqReceiver;
-//public static DataHandler    dataHandler;
 // ///////////////////////////////////////////////////////////////////////////////////
-
-private static Syncron syncron = new Syncron();
+public NodeMsgData mNodeMsgData = new NodeMsgData();
+public boolean     isRunning    = false;
 
 //	access with: Syncron controller = Syncron.getSingletonInstance();
 private Syncron() { }
+
+public synchronized static Syncron getSingletonInstance() {
+	return syncron;
+}
 
 @Override
 public void onCreate() {
@@ -39,10 +43,6 @@ public void onCreate() {
 	//MainActivity mainActivity;
 	//Debug.out("d");
 
-}
-
-public synchronized static Syncron getSingletonInstance() {
-	return syncron;
 }
 
 // ///////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ public void sendIntent(String action) {
 	Toast.makeText(this, "Intent Called", Toast.LENGTH_SHORT).show();
 
 }
-public boolean isRunning = false;
+
 public synchronized void testMsg(final Context context){
 
 	if(!isRunning) {

@@ -24,21 +24,20 @@ import static android.view.View.OnClickListener;
 
 
 public class MainActivity extends ActionBarActivity implements OnClickListener, MsgIntentConstants, Handler.Callback, MsgConstants {
-Button     btn1;
-Button     btn2;
-Button     btn3;
-TextView   tv;
-MyReceiver MyReceiver;
+public static String string = "";
 public MyReceiver myReceiver;
 public MyReceiver myReceiver2;
 public MyReceiver myReceiver3;
 public Handler    mHandler;
 public Handler    mUiHandler;
 public long       mUiThreadId;
-Handler handler;
-public static String string = "";
-
-public  Syncron         app;
+public Syncron    app;
+Button     btn1;
+Button     btn2;
+Button     btn3;
+TextView   tv;
+MyReceiver MyReceiver;
+Handler    handler;
 private RequestReceiver reqReceiver;
 
 @Override
@@ -49,7 +48,10 @@ protected void onCreate(Bundle savedInstanceState) {
 
 	app = Syncron.getSingletonInstance();
 	//app.mActivity = this;
-
+	reqReceiver = new RequestReceiver();
+	reqReceiver.register(this);
+	myReceiver = new MyReceiver();
+	myReceiver.register(this);
 
 	btn1 = (Button) findViewById(R.id.btn1);
 	btn2 = (Button) findViewById(R.id.btn2);
@@ -58,8 +60,6 @@ protected void onCreate(Bundle savedInstanceState) {
 	btn1.setOnClickListener(this);
 	btn2.setOnClickListener(this);
 	btn3.setOnClickListener(this);
-	myReceiver = new MyReceiver();
-	myReceiver.register(this);
 	//myReceiver.setHandler(mHandler);
 	mUiThreadId = Thread.currentThread().getId();
 	mUiHandler = new Handler();
@@ -103,9 +103,11 @@ protected void onCreate(Bundle savedInstanceState) {
 		}
 
 
-	};IntentFilter filter3 = new IntentFilter();
-	filter3.addAction("syncron.msg.q.datalive,DONE");
+	};
+	IntentFilter filter3 = new IntentFilter();
+	filter3.addAction("syncron.msg.q.datalive.DONE");
 	filter3.addAction("syncron.msg.q.testdb.DONE");
+	filter3.addAction(STREAM_DONE);
 	reqReceiver = new RequestReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -113,7 +115,12 @@ protected void onCreate(Bundle savedInstanceState) {
 			TextView tv = (TextView) findViewById(R.id.tv1);
 			//tv.setText("IT WORKED!!!!!!!!!!!!!!!");
 			//tv.setText(intent.getStringExtra("id"));
-			tv.append(intent.getStringExtra("id"));
+
+			if (intent.getAction() == STREAM_DONE) {
+				tv.append(app.dataHandler.getAnalogString());
+			} else {
+				tv.append(intent.getStringExtra("id"));
+			}
 			//MessageWrapper msg = new MessageWrapper(20, 200);
 			//ObjectMessengerThread messenger = new ObjectMessengerThread(IP, PORT_SERVER);
 			//messenger.sendReqest(msg);
@@ -150,6 +157,7 @@ protected void onPause() {
 	myReceiver.unRegister(this);
 	unregisterReceiver(myReceiver2);
 	unregisterReceiver(myReceiver3);
+	unregisterReceiver(reqReceiver);
 }
 
 
@@ -184,13 +192,14 @@ public void onClick(View v) {
 		case R.id.btn1:
 			//app.testMsg(this);
 			intent.setAction(QUERY_DATALIVE);
-			Toast.makeText(this, "Sent "+QUERY_DATALIVE, Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Sent " + QUERY_DATALIVE, Toast.LENGTH_SHORT).show();
 			sendBroadcast(intent);
-		break;
+			break;
 		case R.id.btn2:
-			intent.setAction(QUERY_TESTDB);
+			intent.setAction(STREAM_GET);
+			//intent.setAction(QUERY_TESTDB);
 			sendBroadcast(intent);
-			Toast.makeText(this, "Sent "+QUERY_TESTDB, Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Sent " + QUERY_TESTDB, Toast.LENGTH_SHORT).show();
 			break;
 		case R.id.btn3:
 			intent.setAction(dbDataReqReceived);
@@ -211,7 +220,7 @@ public boolean handleMessage(Message msg) {
 
 			tv.setText("IT WORKED!!!!!!!!!!!!!!!");
 		}
-		});
+	});
 
 
 	return false;
