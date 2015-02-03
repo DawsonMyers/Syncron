@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -16,7 +15,7 @@ import ca.syncron.app2.MainActivity;
 import ca.syncron.app2.tools.Debug;
 import msg.MessageWrapper;
 import msg.MsgConstants;
-import msg.ObjectMessengerThread;
+import msg.client.MessageClient;
 
 public class RequestReceiver extends BroadcastReceiver implements MsgIntentConstants, MsgConstants {
 final String dbDataRequested   = "syncron.msg.db_data_requested";
@@ -34,6 +33,7 @@ public boolean isRunning = false;
 int               receiverCount = 7;
 ArrayList<String> al            = new ArrayList<>();
 Handler mHandler;
+Thread t;
 
 public RequestReceiver() {
 
@@ -61,12 +61,12 @@ public void onReceive(Context context, Intent intent) {
 			context.sendBroadcast(new Intent("syncron.ui").putExtra("id", QUERY4));
 			break;
 		case QUERY_TESTDB:
-			handleRequest(context,SQL,qTEST_DB, intent.getAction());
-			context.sendBroadcast(new Intent("syncron.ui").putExtra("id", QUERY5));
+			handleRequest(context, SQL, qTEST_DB, intent.getAction());
+			//context.sendBroadcast(new Intent("syncron.ui").putExtra("id", QUERY5));
 			break;
 		case STREAM_GET:
 			handleRequest(context, STREAM, 30, intent.getAction());
-			context.sendBroadcast(new Intent("syncron.ui").putExtra("id", "Button 3 clicked"));
+			//context.sendBroadcast(new Intent("syncron.ui").putExtra("id", "Button 3 clicked"));
 			break;
 		//case dbDataReady:
 		//case nodeDataRequested:
@@ -75,7 +75,7 @@ public void onReceive(Context context, Intent intent) {
 
 	}
 
-	Toast.makeText(context.getApplicationContext(), "data received", Toast.LENGTH_SHORT).show();
+	//Toast.makeText(context.getApplicationContext(), "data received", Toast.LENGTH_SHORT).show();
 	//String action = intent.getExtras();
 	//context.sendBroadcast(new Intent("syncron.ui").putExtra("id","Button 1 clicked") );
 
@@ -83,51 +83,41 @@ public void onReceive(Context context, Intent intent) {
 }
 
 public synchronized void handleRequest(final Context context, final int requestId, int queryId, final String action) {
+	ArrayList<String> queryArray = new ArrayList<>();
+	queryArray.add(qDATA_LIVE, QUERY4);
+	queryArray.add(qTEST_DB, QUERY5);
+	final String query;
+	if (queryId < 30) query = queryArray.get(queryId);
+	else query = "";
 
-	//final String query = null;
-	String temp = "";
+
 	//@TODO develop queries
-	switch (queryId) {
-		case qDATA_LIVE:
-			temp = QUERY4;
-			break;
-		case qTEST_DB:
-			temp = QUERY5;
-			break;
-		default:
-			//final String query = null;
-	}
-	final String query = temp.length() > 0 ? temp : "";
-
-	if (!isRunning) {
-		isRunning = true;
-
-		Thread t = new Thread("UIUpdate") {
-
-			public void run() {
-
-				MessageWrapper msg = new MessageWrapper(20, 200);
-				ObjectMessengerThread messenger = new ObjectMessengerThread(IP, PORT_SERVER);
-				//messenger.sendReqest(msg);
-				msg.setRequestId(requestId);
-				msg.setRequestSql(query);
-				msg = messenger.sendReqest(msg, IP, PORT_SERVER);
-				String result = msg.messageObj.dbBundle.rowData;
-				Debug.out(result);
-
-				MyReceiver myReceiver = new MyReceiver();
-
-				Intent i = new Intent(action + ".DONE");
-
-				i.putExtra("id", result);
-				context.sendBroadcast(i); //sendBroadcast(i);
-				isRunning = false;
 
 
-			}
-		};
-		t.start();
-	}
+	t = new Thread("UIUpdate") {
+
+		public void run() {
+
+			MessageClient msgClient = new MessageClient();
+
+			MessageWrapper msg = new MessageWrapper(requestId, 200);
+			msg.setRequestSql(query);
+			msg = msgClient.sendMessage(msg);
+			String result = msg.messageObj.dbBundle.rowData;
+			Debug.out(result);
+
+			Intent i = new Intent(action + ".DONE");
+
+			i.putExtra("id", result);
+			i.putExtra("message", msg);
+			context.sendBroadcast(i); //sendBroadcast(i);
+
+
+		}
+
+	};
+	t.start();
+
 }
 
 public void register(Context context) {

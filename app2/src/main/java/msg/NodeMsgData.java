@@ -9,11 +9,13 @@ import java.io.Serializable;
  * @author Dawson 
  */
 public class NodeMsgData implements Serializable  {
-	// Analog input values
-	public int[] analogVals = null;
+// Analog input values
+public int[]  analogVals   = null;
+public String analogString = "";
 
-	// Digital inputs/outputs
-	public boolean[] digitalInput = null;
+// Digital inputs/outputs
+public boolean[] digitalInput = null;
 
-	public boolean[] digitalOutput = null;
+public boolean[] digitalOutput = null;
 }
+

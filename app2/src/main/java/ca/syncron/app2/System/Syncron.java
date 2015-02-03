@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+
 import ca.syncron.app2.MainActivity;
 import ca.syncron.app2.async.MyReceiver;
 import ca.syncron.app2.async.RequestReceiver;
@@ -16,7 +18,9 @@ import msg.*;
  */
 
 //public Debug print;
+
 public class Syncron extends Application implements MsgConstants {
+public static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");   // "[" + sdf.format(new Date()) + "]"
 public static Syncron     singleton;
 public static DataHandler dataHandler;
 public static  NodeData nodeData = new NodeData();

@@ -46,12 +46,12 @@ public 	MessageWrapper(Object msgObject, int actionId) {
 		return messageObj;
 	}
 
-	public void setRequestId(int requestId) {
-		this.mRequestId = requestId;
+public int getRequestId() {
+	return mRequestId;
 	}
 
-	public int getRequestId() {
-		return mRequestId;
+public void setRequestId(int requestId) {
+	this.mRequestId = requestId;
 	}
 
 	public void setRequestSql(String query) {
@@ -61,5 +61,9 @@ public 	MessageWrapper(Object msgObject, int actionId) {
 public String getQuery() {
 	mQuery = messageObj.dbBundle.sqlQuery;
 	return mQuery;
+}
+
+public synchronized String getAnalogString() {
+	return messageObj.getAnalogString();
 }
 }

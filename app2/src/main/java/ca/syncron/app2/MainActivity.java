@@ -18,6 +18,7 @@ import ca.syncron.app2.System.Syncron;
 import ca.syncron.app2.async.MsgIntentConstants;
 import ca.syncron.app2.async.MyReceiver;
 import ca.syncron.app2.async.RequestReceiver;
+import msg.MessageWrapper;
 import msg.MsgConstants;
 
 import static android.view.View.OnClickListener;
@@ -25,13 +26,14 @@ import static android.view.View.OnClickListener;
 
 public class MainActivity extends ActionBarActivity implements OnClickListener, MsgIntentConstants, Handler.Callback, MsgConstants {
 public static String string = "";
-public MyReceiver myReceiver;
-public MyReceiver myReceiver2;
-public MyReceiver myReceiver3;
-public Handler    mHandler;
-public Handler    mUiHandler;
-public long       mUiThreadId;
-public Syncron    app;
+public MyReceiver   myReceiver;
+public MyReceiver   myReceiver2;
+public MyReceiver   myReceiver3;
+public Handler      mHandler;
+public Handler      mUiHandler;
+public long         mUiThreadId;
+public Syncron      app;
+public MainActivity mActivity;
 Button     btn1;
 Button     btn2;
 Button     btn3;
@@ -52,7 +54,7 @@ protected void onCreate(Bundle savedInstanceState) {
 	reqReceiver.register(this);
 	myReceiver = new MyReceiver();
 	myReceiver.register(this);
-
+	mActivity = this;
 	btn1 = (Button) findViewById(R.id.btn1);
 	btn2 = (Button) findViewById(R.id.btn2);
 	btn3 = (Button) findViewById(R.id.btn3);
@@ -116,10 +118,15 @@ protected void onCreate(Bundle savedInstanceState) {
 			//tv.setText("IT WORKED!!!!!!!!!!!!!!!");
 			//tv.setText(intent.getStringExtra("id"));
 
-			if (intent.getAction() == STREAM_DONE) {
-				tv.append(app.dataHandler.getAnalogString());
-			} else {
-				tv.append(intent.getStringExtra("id"));
+			try {
+				if (intent.getAction() == STREAM_DONE) {
+					MessageWrapper msg = (MessageWrapper) intent.getSerializableExtra("message");
+					tv.append(msg.getAnalogString());
+				} else {
+					tv.append(intent.getStringExtra("id"));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			//MessageWrapper msg = new MessageWrapper(20, 200);
 			//ObjectMessengerThread messenger = new ObjectMessengerThread(IP, PORT_SERVER);
@@ -196,6 +203,8 @@ public void onClick(View v) {
 			sendBroadcast(intent);
 			break;
 		case R.id.btn2:
+			intent.setAction(STREAM_GET);
+			//RequestReceiver receiver = new RequestReceiver().handleRequest(mActivity.this, STREAM, 30, intent.getAction());
 			intent.setAction(STREAM_GET);
 			//intent.setAction(QUERY_TESTDB);
 			sendBroadcast(intent);

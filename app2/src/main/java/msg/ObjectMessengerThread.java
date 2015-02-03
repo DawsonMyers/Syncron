@@ -1,6 +1,8 @@
 package msg;
 
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import socketmsg.ObjectMessengerBase;
 
@@ -17,18 +19,18 @@ public int requestId;
 
 // public ObjLock objLock = new ObjLock();
 
-// Constructors
-// ///////////////////////////////////////////////////////////////////////////////////
-public ObjectMessengerThread() {
-		super();
-
-	}
-
 	public ObjectMessengerThread(Socket socket) {
 		// super(socket);
 		this();
 		this.socket = socket;
 		start();
+	}
+
+// Constructors
+// ///////////////////////////////////////////////////////////////////////////////////
+public ObjectMessengerThread() {
+	super();
+
 	}
 
 	public ObjectMessengerThread(String ip, int port) {
@@ -46,7 +48,8 @@ public ObjectMessengerThread() {
 
 		requestId = msg.mRequestId;
 		String q = msg.getQuery();
-		if(q.length() >0)query = q ; else query = "";
+		if (q.length() < 5) query = q;
+		else requestId = STREAM;
 		this.start();
 		synchronized (objLock) {
 			try {
@@ -60,14 +63,26 @@ public ObjectMessengerThread() {
 		return this.msg;
 	}
 //	Send with only msg
-public void sendReqest(MessageWrapper msg) {
-	this.ip = msg.IP;
-	this.serverPort = msg.PORT_SERVER;
+public MessageWrapper sendReqest(MessageWrapper msg) {
+
 	this.msg = msg;
 	this.start();
+
+
+	synchronized (objLock) {
+		try {
+
+			objLock.wait();
+			os.close();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	return this.msg;
 }
 
-	// Run
+
+// Run
 	// ///////////////////////////////////////////////////////////////////////////////////
 	// either send-receive (client) or receive-send (server)
 	public synchronized void run() {
@@ -79,14 +94,16 @@ public void sendReqest(MessageWrapper msg) {
 			//msg.mStatus = 0;
 			timer.start();
 			//msg.setRequestId(SQL);
-			msg.setRequestId(requestId);
-			msg.setRequestSql(query);
+			//msg.setRequestId(requestId);
+			//msg.setRequestSql(query);
 			//msg.messageObj.dbBundle.sqlQuery = QUERY5;
 			sendMessage(this.msg);
+			System.out.println((new SimpleDateFormat("[MMM-dd HH.mm.ss.SSS]")).format(new Date()) + " Message sent to server");
 			msg = readMessage();
+			System.out.println((new SimpleDateFormat("[MMM-dd HH.mm.ss.SSS]")).format(new Date()) + " Message Received from server");
 			timer.finish(msgTime);
 			timer.print();
-			System.out.println("Message #" + msg.mStatus);
+			System.out.println((new SimpleDateFormat("[MMM-dd HH.mm.ss.SSS]")).format(new Date()) + " Message #" + msg.mStatus);
 		} else {
 			//	server response
 			os.connectServer(socket);
