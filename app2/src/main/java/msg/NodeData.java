@@ -9,6 +9,7 @@ import java.io.Serializable;
  * @author Dawson
  */
 public class NodeData implements Serializable {
+private static final long serialVersionUID = 1L;
 
 // Analog input values
 public static int[]     analogVals   = null;

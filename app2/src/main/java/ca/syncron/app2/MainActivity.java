@@ -109,7 +109,7 @@ protected void onCreate(Bundle savedInstanceState) {
 	IntentFilter filter3 = new IntentFilter();
 	filter3.addAction("syncron.msg.q.datalive.DONE");
 	filter3.addAction("syncron.msg.q.testdb.DONE");
-	filter3.addAction(STREAM_DONE);
+	filter3.addAction(STREAM_GET_DONE);
 	reqReceiver = new RequestReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -119,9 +119,9 @@ protected void onCreate(Bundle savedInstanceState) {
 			//tv.setText(intent.getStringExtra("id"));
 
 			try {
-				if (intent.getAction() == STREAM_DONE) {
+				if (intent.getAction() == STREAM_GET_DONE) {
 					MessageWrapper msg = (MessageWrapper) intent.getSerializableExtra("message");
-					tv.append(msg.getAnalogString());
+					tv.append(msg.messageObj.nodeData.analogString);
 				} else {
 					tv.append(intent.getStringExtra("id"));
 				}

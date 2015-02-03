@@ -17,5 +17,6 @@ final String QUERY_DATALIVE_DONE = "syncron.msg.q.datalive.DONE";
 final String QUERY_TESTDB        = "syncron.msg.q.testdb";
 final String QUERY_TESTDB_DONE   = "syncron.msg.q.testdb.DONE";
 final String STREAM_GET          = "syncron.msg.stream.get";
+final String STREAM_GET_DONE     = "syncron.msg.stream.get.DONE";
 final String STREAM_DONE         = "syncron.msg.stream.DONE";
 }

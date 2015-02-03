@@ -12,7 +12,7 @@ public interface MsgConstants {
 	public static final int		STREAM			= 30;
 	// Device identifiers
 	public static final int		ANDROID			= 100, PC = 105, SERVER = 110, NODE = 115;
-	public static final String	QUERY4			= "SELECT * FROM DataLive", QUERY5 = "SELECT * FROM log LIMIT 50";
+public static final String QUERY4 = "SELECT * FROM DataLive LIMIT 12", QUERY5 = "SELECT * FROM log LIMIT 50";
 
 public static       String IP_HOME      = "192.168.1.109";
 public static       String IP           = IP_HOME;

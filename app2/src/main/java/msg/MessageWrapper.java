@@ -6,11 +6,11 @@ import java.io.Serializable;
  * Created by Dawson on 1/29/2015.
  */
 public class MessageWrapper implements Serializable, MsgConstants {
-	/**
-	 * 
-	 */
-	private static final long	serialVersionUID	= 4680391683892841426L;
-	public int					mMsgId, mObjectId, mUserId, mActionId, mStatus;
+/**
+ *
+ */
+private static final long serialVersionUID = 1L;
+public int mMsgId, mObjectId, mUserId, mActionId, mStatus;
 public int      mRequestId;
 public String[] mStringsArgs;
 public int[]    mIntArgs;
