@@ -74,7 +74,7 @@ public void onCreate() {
 	super.onCreate();
 	singleton = this;
 	syncron = this;
-	dataHandler = new DataHandler();
+	dataHandler = new DataHandler( );
 }
 
 

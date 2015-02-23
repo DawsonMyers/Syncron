@@ -387,7 +387,7 @@ synchronized public static MsgObject getMsgObj() {
  */
 synchronized public static void setMsgObj(MsgObject pMsgObj) {
 	msgObj = pMsgObj;
-	Syncron.setMsgObj(pMsgObj);
+	//Syncron.setMsgObj(pMsgObj);
 }
 
 }
